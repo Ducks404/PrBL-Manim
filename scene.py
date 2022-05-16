@@ -43,6 +43,7 @@ class Test(Scene):
 
 class TestNode(Scene):
     def construct(self):
+        # Testing the nodes
         n = node.Node(0,0, WHITE, radius=0.5)
         n1 = node.Node(0,0, WHITE, radius=0.5)
         n2 = node.Node(0,-3, WHITE, radius=0.5)
@@ -56,3 +57,40 @@ class TestNode(Scene):
         n1.show(self)
         self.wait(1)
         self.play(ApplyMethod(n1.node.shift, [1,1,0]), ApplyMethod(n.node.shift, [0,-1,0]))
+
+class TestServer(Scene):
+    def construct(self):
+        # Testing the servers
+        s = Square(side_length=3.0, grid_xstep=1.0, grid_ystep=1.0)
+        s1 = Square(side_length=0.8)
+        s2 = Square(side_length=0.8).next_to(s1, direction=UP, buff=0.3)
+        s3 = Square(side_length=0.8).next_to(s2, direction=LEFT, buff=0.3)
+        s4 = Square(side_length=0.8).next_to(s2, direction=RIGHT, buff=0.3)
+        s5 = Square(side_length=0.8).next_to(s1, direction=LEFT, buff=0.3)
+        s6 = Square(side_length=0.8).next_to(s1, direction=RIGHT, buff=0.3)
+        s7 = Square(side_length=0.8).next_to(s1, direction=DOWN, buff=0.3)
+        s8 = Square(side_length=0.8).next_to(s7, direction=LEFT, buff=0.3)
+        s9 = Square(side_length=0.8).next_to(s7, direction=RIGHT, buff=0.3)
+        server = Group(*[s1,s2,s3,s4,s5,s6,s7,s8,s9])
+        s1 = Square(side_length=0.8)
+        s2 = Square(side_length=0.8).next_to(s1, direction=UP, buff=0.2)
+        s3 = Square(side_length=0.8).next_to(s2, direction=LEFT, buff=0.2)
+        s4 = Square(side_length=0.8).next_to(s2, direction=RIGHT, buff=0.2)
+        s5 = Square(side_length=0.8).next_to(s1, direction=LEFT, buff=0.2)
+        s6 = Square(side_length=0.8).next_to(s1, direction=RIGHT, buff=0.2)
+        s7 = Square(side_length=0.8).next_to(s1, direction=DOWN, buff=0.2)
+        s8 = Square(side_length=0.8).next_to(s7, direction=LEFT, buff=0.2)
+        s9 = Square(side_length=0.8).next_to(s7, direction=RIGHT, buff=0.2)
+        server1 = Group(*[s1,s2,s3,s4,s5,s6,s7,s8,s9])
+        s1 = Square(side_length=0.8)
+        s2 = Square(side_length=0.8).next_to(s1, direction=UP, buff=0.1)
+        s3 = Square(side_length=0.8).next_to(s2, direction=LEFT, buff=0.1)
+        s4 = Square(side_length=0.8).next_to(s2, direction=RIGHT, buff=0.1)
+        s5 = Square(side_length=0.8).next_to(s1, direction=LEFT, buff=0.1)
+        s6 = Square(side_length=0.8).next_to(s1, direction=RIGHT, buff=0.1)
+        s7 = Square(side_length=0.8).next_to(s1, direction=DOWN, buff=0.1)
+        s8 = Square(side_length=0.8).next_to(s7, direction=LEFT, buff=0.1)
+        s9 = Square(side_length=0.8).next_to(s7, direction=RIGHT, buff=0.1)
+        server2 = Group(*[s1,s2,s3,s4,s5,s6,s7,s8,s9])
+        group = Group(server, server1, server2).arrange(buff=1)
+        self.add(group)
