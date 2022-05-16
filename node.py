@@ -4,17 +4,11 @@ import math as m
 def PoltoCar(r, theta):
     x = round(r * m.cos(theta),2)
     y = round(r * m.sin(theta), 2)
-    return([x,y,0])
+    return np.array([x,y,0])
 
 def hyp(a, b):
     c = m.sqrt(a**2+b**2)
     return(c)
-
-def add2lists(l1, l2):
-    li = []
-    for d, i in enumerate(l1):
-        li.append(i-l2[d])
-    return li
 
 def stickLine(line, node, target):
     # print(line.get_start_and_end(), node.node.get_center(), target.node.get_center())
@@ -22,13 +16,13 @@ def stickLine(line, node, target):
     targetC = target.node.get_center()
     angle = angle_of_vector(nodeC - targetC)
     # print(angle)
-    start = add2lists(nodeC, PoltoCar(node.radius, angle))
+    start = nodeC - PoltoCar(node.radius, angle)
     sign = int(angle<0)
     if sign:
         opp_angle = m.pi + angle
     else:
         opp_angle = -m.pi + angle
-    end = add2lists(targetC, PoltoCar(target.radius, opp_angle))
+    end = targetC - PoltoCar(target.radius, opp_angle)
     line.put_start_and_end_on(start, end)
 
 
@@ -36,7 +30,7 @@ class Node():
     def __init__(self, x, y, color, radius=1):
         self.color = color
         self.radius = radius
-        self.node = Circle(radius=radius, color=color).move_to([x,y,0])
+        self.node = Circle(radius=radius, color=color).move_to(np.array([x,y,0]))
         self.edges=[]
         
     def show(self, scene):
@@ -58,7 +52,7 @@ class Node():
         x = self.node.get_x()
         y = self.node.get_y()
         temp = Server(x, y, self.color, self.radius*2)
-        temp.node.shift([x, y, 0])
+        temp.node.shift(np.array([x, y, 0]))
         scene.play(Transform(self.node, temp.node))
         self.node = temp.node
         
