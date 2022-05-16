@@ -32,7 +32,8 @@ class Node():
         self.radius = radius
         self.node = Circle(radius=radius, color=color).move_to(np.array([x,y,0]))
         self.edges=[]
-        
+        self.server = False
+
     def show(self, scene):
         # print(scene)
         scene.play(FadeIn(self.node))
@@ -45,29 +46,35 @@ class Node():
         line = Line()
         stickLine(line, self, target)
         line.add_updater(lambda l: stickLine(l, self, target))
-        self.edges.append(line)
+        self[target] = line
+        target[self] = line
 
     def upgrade(self, scene):
         # Transform circle to square and replaces self.node
         x = self.node.get_x()
         y = self.node.get_y()
-        temp = Server(x, y, self.color, self.radius*2)
-        temp.node.shift(np.array([x, y, 0]))
-        scene.play(Transform(self.node, temp.node))
-        self.node = temp.node
-        
+        temp = Square(side_length=self.radius*2, color=self.color).shift(np.array([x, y, 0]))
+        scene.play(Transform(self.node, temp))
+        self.node = temp
+        self.server = True
+
+        # Adjust edge updaters
+        line.add_updater(lambda l: stickLine_server(l, self, target))
+
+
 '''
 Notes:
 if you want to connect then target should be the parent because line will show with self
 
 
 '''
-class Server():
-    def __init__(self, x, y, color, side):
-        self.color = color
-        self.side = side
-        self.node = Square(side_length=side)
-        self.edges = []
-    
-    def show(self, scene):
-        scene.play(FadeIn(self.server))
+
+
+# class Server():
+#     def __init__(self, x, y, color, side):
+#         self.color = color
+#         self.side = side
+#         self.node = Square(side_length=side)
+
+#     def show(self, scene):
+#         scene.play(FadeIn(self.server))
