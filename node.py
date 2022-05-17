@@ -34,7 +34,7 @@ def lexpression(a, b):
         m = (b[1]-a[1])/(b[0]-a[0])
         vert = False
     else:
-        m = 0
+        m = a[0]
         vert = True
     c = a[1]-m*a[0]
     return [round(m, 2), round(c, 2), vert]
