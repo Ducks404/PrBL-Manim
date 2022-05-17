@@ -1,7 +1,7 @@
 from manim import *
 import math as m
 
-config['disable_caching'] = True
+# config['disable_caching'] = True
 
 def PoltoCar(r, theta):
     x = round(r * m.cos(theta),2)
@@ -144,7 +144,7 @@ class Node():
         x = self.node.get_x()
         y = self.node.get_y()
         temp = Square(side_length=self.radius*2, color=self.color).shift(np.array([x, y, 0]))
-        scene.play(Transform(self.node, temp))
+        scene.play(ReplacementTransform(self.node, temp))
         self.node = temp
         self.server = True
 
@@ -154,6 +154,52 @@ class Node():
         for line in self.end_edges.values():
             line.add_updater(lambda l, self=self: stickLine_server(l, self))
 
+    def divide(self, scene):
+        if self.server:
+            buff = 0.1
+            oriside = self.node.side_length
+            side = round((oriside-buff*2)/3, 2)
+
+            # Use lines to cut the square
+            scene.play(ApplyMethod(self.node.scale, (side*3)/oriside, run_time=0.1))
+            oside = side*3
+            l1 = Line(start=self.node.get_center()+np.array([-oside/6,oside/2,0]),
+            end=self.node.get_center()+np.array([-oside/6,-oside/2,0]))
+            l2 = Line(start=self.node.get_center()+np.array([oside/6,-oside/2,0]),
+            end=self.node.get_center()+np.array([oside/6,oside/2,0]))
+            l3 = Line(start=self.node.get_center()+np.array([-oside/2,-oside/6,0]),
+            end=self.node.get_center()+np.array([oside/2,-oside/6,0]))
+            l4 = Line(start=self.node.get_center()+np.array([oside/2,oside/6,0]),
+            end=self.node.get_center()+np.array([-oside/2,oside/6,0]))
+            lines = [l1,l2,l3,l4]
+            scene.play(*[Create(line) for line in lines], run_time=0.1)
+
+            # Add smaller squares
+            squares = []
+            for x in range(-1,2):
+                for y in range(-1,2):
+                    squares.append(Square(side_length=side).next_to(self.node, np.array([x,y,0]), buff=-side))
+            scene.play(*[FadeIn(square) for square in squares], run_time=0.1)
+
+            # Remove the previous square
+            scene.play(self.node.animate.set_stroke(width=0),*[FadeOut(line) for line in lines], run_time=0.1)
+
+            # Move the smaller squares
+            scene.play(ApplyMethod(self.node.scale, oriside/(side*3)), run_time=0.1)
+            counter = 0
+            animations = []
+            for x in range(-1,2):
+                for y in range(-1,2):
+                    animations.append(ApplyMethod(squares[counter].next_to, self.node, np.array([x,y,0]), -side, run_time=0.1))
+                    counter += 1
+            scene.play(*animations)
+
+            # Add updaters
+            counter = 0
+            for x in range(-1,2):
+                for y in range(-1,2):
+                    squares[counter].add_updater(lambda s, x=x, y=y: s.next_to(self.node, np.array([x,y,0]), buff=-side))
+                    counter += 1
 
 '''
 Notes:
