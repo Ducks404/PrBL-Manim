@@ -127,11 +127,14 @@ class Node():
     def show(self, scene):
         # print(scene)
         scene.play(FadeIn(self.node))
-        edge_animations = []
-        for line in self.start_edges.values():
-            edge_animations.append(FadeIn(line))
-        scene.play(AnimationGroup(*edge_animations))
-
+        # edge_animations = []
+        # for line in self.start_edges.values():
+        #     edge_animations.append(FadeIn(line))
+        try:
+            scene.play(*[FadeIn(line) for line in self.start_edges.values()])
+        except Exception as e:
+            print(repr(e))
+        
     def connect(self, target):
         line = Line()
         stickLine(line, self, target)
