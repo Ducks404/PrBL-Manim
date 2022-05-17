@@ -55,9 +55,10 @@ class TestNode(Scene):
         n.show(self)
         n2.show(self)
         n1.show(self)
-        self.wait(1)
         self.play(ApplyMethod(n1.node.shift, [1,1,0]), ApplyMethod(n.node.shift, [0,-1,0]))
         n1.upgrade(self)
+        self.play(ApplyMethod(n.node.shift, [7, -5, 0]))
+        self.wait(1)
 
 class TestServer(Scene):
     def construct(self):
