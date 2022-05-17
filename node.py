@@ -17,7 +17,7 @@ def stickLine(line, node, target):
     nodeC = node.node.get_center()
     targetC = target.node.get_center()
     angle = angle_of_vector(nodeC - targetC)
-    print(angle)
+    # print(angle)
     start = nodeC - PoltoCar(node.radius, angle)
     sign = int(angle<0)
     if sign:
@@ -84,8 +84,8 @@ def stickLine_server(line, server):
     exp_down = lexpression(BL, BR)
     exp_left = lexpression(TL, BL)
 
-    print(f'BL:{BL}\nBR:{BR}\nline:{l1}{l2}\nexp_l:{exp_l}\nexp_down:{exp_down}')
-    print(f'TL:{TL}\nBL:{BL}\nexp_left:{exp_left}')
+    # print(f'BL:{BL}\nBR:{BR}\nline:{l1}{l2}\nexp_l:{exp_l}\nexp_down:{exp_down}')
+    # print(f'TL:{TL}\nBL:{BL}\nexp_left:{exp_left}')
 
     '''
     Check the intersection Source:(https://stackoverflow.com/questions/385305/efficient-maths-algorithm-to-calculate-intersections#:~:text=express%20the%20straight%20lines%20in,then%20there%20is%20an%20intersection.)
@@ -102,22 +102,18 @@ def stickLine_server(line, server):
         inter = intersection(exp_l, exp_right)
     elif not checkside(BL, BR, exp_l) and not checkside(l1, l2, exp_down):
         inter = intersection(exp_l, exp_down)
-        print('bottom', inter)
     elif not checkside(TL, BL, exp_l) and not checkside(l1, l2, exp_left):
         inter = intersection(exp_l, exp_left)
-        print('left', inter)
     else:
         print('Something went wrong with finding the intersection')
 
     # Check if the server is at the end or start
     if server_place:
-        print(checkside(BL, BR, exp_l), checkside(l1, l2, exp_down))
-        print(checkside(TL, BL, exp_l), checkside(l1, l2, exp_left))
         line.put_start_and_end_on(inter, line.get_end())
-        print(line.get_start(), 'line start')
+        # print(line.get_start(), 'line start')
     else:
-        # line.put_start_and_end_on(line.get_start(), inter)
-        print(line.get_end(), 'line end')
+        line.put_start_and_end_on(line.get_start(), inter)
+        # print(line.get_end(), 'line end')
 
 class Node():
     def __init__(self, x, y, color, radius=1):
