@@ -12,6 +12,10 @@ def hyp(a, b):
     c = m.sqrt(a**2+b**2)
     return(c)
 
+def get_length(start, end):
+    diff = end-start
+    return(hyp(diff[0],diff[1]))
+
 def stickLine(line, node, target):
     # print(line.get_start_and_end(), node.node.get_center(), target.node.get_center())
     nodeC = node.node.get_center()
@@ -26,6 +30,18 @@ def stickLine(line, node, target):
         opp_angle = -m.pi + angle
     end = targetC - PoltoCar(target.radius, opp_angle)
     line.put_start_and_end_on(start, end)
+
+def stickLine2line(line, track, length, switch):
+    if not switch:
+        tstart = track.get_start()
+        tend = track.get_end()
+    else:
+        tstart = track.get_end()
+        tend = track.get_start()
+    angle = angle_of_vector(tstart - tend)
+    start = tstart
+    end = tstart - PoltoCar(length, angle)
+    return [start, end]
 
 # Takes in 2 points
 def lexpression(a, b):
@@ -145,6 +161,24 @@ class Node():
         self.start_edges[target] = line
         target.end_edges[self] = line
 
+    def send(self, target, scene):
+        try:
+            track = self.start_edges[target]
+        except KeyError:
+            track = self.end_edges[target]
+
+        data = Line().set_color_by_gradient([WHITE, rgb_to_color([0, 0, 1]), WHITE])
+        start = stickLine2line(data, track, 1, False)
+        data.put_start_and_end_on(start[0], start[1])
+        scene.play(Create(data, rate_func=linear))
+
+        des_buff = get_length(data.get_start(), data.get_end())/2
+        des = stickLine2line(data, track, des_buff, True)[1]
+        scene.play(ApplyMethod(data.move_to, des, rate_func=linear))
+
+        data.rotate(180*DEGREES)
+        scene.play(Uncreate(data, rate_func=linear))
+
     def upgrade(self, scene):
         # Transform circle to square and replaces self.node
         x = self.node.get_x()
@@ -211,15 +245,4 @@ class Node():
 Notes:
 if you want to connect then target should be the parent because line will show with self
 
-
 '''
-
-
-# class Server():
-#     def __init__(self, x, y, color, side):
-#         self.color = color
-#         self.side = side
-#         self.node = Square(side_length=side)
-
-#     def show(self, scene):
-#         scene.play(FadeIn(self.server))

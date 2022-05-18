@@ -52,6 +52,7 @@ class TestNode(Scene):
         n1.node.shift([0,0,0])
         n1.connect(n)
         n1.connect(n2)
+        n.connect(n2)
         self.play(*n.show(), *n2.show())
         self.play(*n1.show())
         self.play(ApplyMethod(n1.node.shift, [1,1,0]), ApplyMethod(n.node.shift, [0,-1,0]))
@@ -59,6 +60,28 @@ class TestNode(Scene):
         self.play(ApplyMethod(n.node.shift, [7, -5, 0]))
         n1.divide(self)
         self.play(ApplyMethod(n1.node.shift,[-3,0,0]))
+        n.send(n2, self)
+        n1.send(n, self)
+        n2.send(n1, self)
+
+class TestData(Scene):
+    def construct(self):
+        # data = node.Data(0, 0, YELLOW, 20)
+        # self.add(data.light)
+        # data1 = Dot(radius=3).set_color_by_gradient([YELLOW, WHITE])
+        # self.add(data1)
+        # data = Dot(radius=0.05, color=BLUE)
+        # rings = [Annulus(inner_radius=i*0.1, outer_radius=(i+1)*0.1, color=BLUE_A) for i in range(1,10)]
+        # rings.reverse()
+        # ring = Group(*rings)
+        # ring.set_colors_by_radial_gradient(radius=1,inner_color=BLUE,outer_color=BLACK)
+        # self.play(FadeIn(data,ring))
+        n = node.Node(LEFT*2, WHITE, 0.5)
+        n1 = node.Node(RIGHT*2, WHITE, 0.5)
+        n1.connect(n)
+        self.play(*n.show(), *n1.show())
+        n.send(n1, self)
+
 
 class TestServer(Scene):
     def construct(self):
