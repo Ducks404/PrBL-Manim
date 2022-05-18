@@ -60,9 +60,9 @@ class TestNode(Scene):
         self.play(ApplyMethod(n.node.shift, [7, -5, 0]))
         n1.divide(self)
         self.play(ApplyMethod(n1.node.shift,[-3,0,0]))
-        n.send(n2, self)
+        n.send(n1, self)
         n1.send(n, self)
-        n2.send(n1, self)
+        n2.send_through([n, n1, n2, n1], self)
 
 class TestData(Scene):
     def construct(self):
