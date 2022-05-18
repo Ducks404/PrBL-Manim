@@ -184,6 +184,12 @@ class Node():
         data.rotate(180*DEGREES)
         scene.play(Uncreate(data, rate_func=linear))
 
+    def send_through(self, route, scene):
+        route.insert(0, self)
+        for index, node in enumerate(route):
+            if index != len(route)-1:
+                node.send(route[index+1], scene)
+
     def upgrade(self, scene):
         # Transform circle to square and replaces self.node
         x = self.node.get_x()

@@ -82,6 +82,7 @@ class TestData(Scene):
         self.play(*n.show(), *n1.show())
         n.send(n1, self)
         n1.send(n, self)
+        n2.send_through([n, n1, n2, n1], self)
 
 class TestServer(Scene):
     def construct(self):
