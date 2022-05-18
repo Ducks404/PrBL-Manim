@@ -161,7 +161,7 @@ class Node():
         self.start_edges[target] = line
         target.end_edges[self] = line
 
-    def send(self, target, scene):
+    def send(self, target, scene, length=1, speed=5):
         try:
             track = self.start_edges[target]
             switch = False
@@ -173,22 +173,23 @@ class Node():
             print('Target not connected to self')
 
         data = Line().set_color_by_gradient([WHITE, rgb_to_color([0, 0, 1]), WHITE])
-        start = stickLine2line(data, track, 1, True and switch)
+        start = stickLine2line(data, track, length, True and switch)
         data.put_start_and_end_on(start[0], start[1])
-        scene.play(Create(data, rate_func=linear))
+        scene.play(Create(data, rate_func=linear, run_time=length/speed))
 
         des_buff = get_length(data.get_start(), data.get_end())/2
         des = stickLine2line(data, track, des_buff, not (True and switch))[1]
-        scene.play(ApplyMethod(data.move_to, des, rate_func=linear))
+        len_move = get_length((start[0]+start[1])/2, des)
+        scene.play(ApplyMethod(data.move_to, des, rate_func=linear, run_time=len_move/speed))
 
         data.rotate(180*DEGREES)
-        scene.play(Uncreate(data, rate_func=linear))
+        scene.play(Uncreate(data, rate_func=linear, run_time=length/speed))
 
-    def send_through(self, route, scene):
+    def send_through(self, route, scene, length=1, speed=5):
         route.insert(0, self)
         for index, node in enumerate(route):
             if index != len(route)-1:
-                node.send(route[index+1], scene)
+                node.send(route[index+1], scene, length, speed)
 
     def upgrade(self, scene):
         # Transform circle to square and replaces self.node
