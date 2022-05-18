@@ -116,24 +116,27 @@ def stickLine_server(line, server):
         # print(line.get_end(), 'line end')
 
 class Node():
-    def __init__(self, x, y, color, radius=1):
+    def __init__(self, pos, color, radius=1):
         self.color = color
         self.radius = radius
-        self.node = Circle(radius=radius, color=color).move_to(np.array([x,y,0]))
+        self.node = Circle(radius=radius, color=color).move_to(np.array(pos))
         self.start_edges = {}
         self.end_edges = {}
         self.server = False
 
-    def show(self, scene):
+    def show(self):
+        animations = []
         # print(scene)
-        scene.play(FadeIn(self.node))
+        animations.append((FadeIn(self.node)))
         # edge_animations = []
         # for line in self.start_edges.values():
         #     edge_animations.append(FadeIn(line))
         try:
-            scene.play(*[FadeIn(line) for line in self.start_edges.values()])
+            animations.extend([FadeIn(line) for line in self.start_edges.values()])
         except Exception as e:
             print(repr(e))
+
+        return animations
         
     def connect(self, target):
         line = Line()

@@ -44,17 +44,16 @@ class Test(Scene):
 class TestNode(Scene):
     def construct(self):
         # Testing the nodes
-        n = node.Node(0,0, WHITE, radius=0.5)
-        n1 = node.Node(0,0, WHITE, radius=0.5)
-        n2 = node.Node(0,-3, WHITE, radius=0.5)
+        n = node.Node([0,0,0], WHITE, radius=0.5)
+        n1 = node.Node([0,0,0], WHITE, radius=0.5)
+        n2 = node.Node([0,-3,0], WHITE, radius=0.5)
         # print(WHITE)
         n.node.shift([-3,3,0])
         n1.node.shift([0,0,0])
         n1.connect(n)
         n1.connect(n2)
-        n.show(self)
-        n2.show(self)
-        n1.show(self)
+        self.play(*n.show(), *n2.show())
+        self.play(*n1.show())
         self.play(ApplyMethod(n1.node.shift, [1,1,0]), ApplyMethod(n.node.shift, [0,-1,0]))
         n1.upgrade(self)
         self.play(ApplyMethod(n.node.shift, [7, -5, 0]))
