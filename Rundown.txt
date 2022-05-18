@@ -1,0 +1,62 @@
+// Intro
+- Me in front of camera intro
+- Intro of google earth flying up to title "Keadaan Internet: Sistem Terpusat vs Terdesentralisasi"
+- Background of earth spinning and a node graph representing a network
+
+// Survey data
+- Pie chart of how much knows centralized or decentralized is
+- Knowledge vs Care graph
+
+// Transition to explanation
+- Big moving network of nodes
+- Trimming the network to show a small network
+
+// Centralized explanation
+- Morphing a center node into a square (server)
+- 1s and 0s in the server square
+- Nodes transferring data from and to the server
+
+// Decentralized explanation
+- Add more nodes and turn more nodes into servers
+- Nodes transferring data through a lot of servers
+
+// Examples
+- Centralized and Decentralized side by side in boxes
+- List under the boxes
+
+// More survey data
+- Bar graph of 1 through 5
+- Lock in front of something to represent data in 1 side
+- No crime sign in 5 side
+- Possible represent contoh masalah
+- Balance scale
+
+// Current Internet
+- Starting with decentralized graph
+- Add a bunch of nodes and servers
+- Divide servers to data centers
+- Data, divide data, data move through nodes using different paths
+- Logos of big companies behind data centers
+
+// Future of the Internet
+- List of differences on the left
+- Data based on color found with location on left
+- Data based on color found with color
+- Ledger on the left then share copies throughout the nodes
+
+// Credits
+- My face recording on the left
+- Credits roll on the right: Mr Eka, 83 respondents, manim, any other resources I used
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+WHAT I NEED THE NODES TO BE ABLE TO DO
+
+- Set X and Y of node ✔
+- Show an ellipse on the screen ✔
+- Morph ellipse into square ✔
+- Connect nodes with edges ✔
+- Edges pulse with color when transferring data ✔
+- Divide squares into nine smaller squares ✔
+- Move the nodes around ✔
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
