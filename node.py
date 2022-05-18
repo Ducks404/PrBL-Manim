@@ -164,16 +164,21 @@ class Node():
     def send(self, target, scene):
         try:
             track = self.start_edges[target]
+            switch = False
         except KeyError:
             track = self.end_edges[target]
+            switch = True
+        except:
+            print(repr(Exception))
+            print('Target not connected to self')
 
         data = Line().set_color_by_gradient([WHITE, rgb_to_color([0, 0, 1]), WHITE])
-        start = stickLine2line(data, track, 1, False)
+        start = stickLine2line(data, track, 1, True and switch)
         data.put_start_and_end_on(start[0], start[1])
         scene.play(Create(data, rate_func=linear))
 
         des_buff = get_length(data.get_start(), data.get_end())/2
-        des = stickLine2line(data, track, des_buff, True)[1]
+        des = stickLine2line(data, track, des_buff, not (True and switch))[1]
         scene.play(ApplyMethod(data.move_to, des, rate_func=linear))
 
         data.rotate(180*DEGREES)

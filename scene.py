@@ -81,7 +81,7 @@ class TestData(Scene):
         n1.connect(n)
         self.play(*n.show(), *n1.show())
         n.send(n1, self)
-
+        n1.send(n, self)
 
 class TestServer(Scene):
     def construct(self):
