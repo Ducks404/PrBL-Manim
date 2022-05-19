@@ -22,25 +22,24 @@ class SurveyData(Scene):
         a_only_c = 9.6 / 100 * 360
         a_only_d = 4.8 / 100 * 360
         r = 1.5
-        green = "#81b29a"
-        blue = "#454866"
-        red = "#e07a5f"
+        y_offset = -1
         c1 = RED_E
         c2 = GREEN_E
         c3 = YELLOW_C
         c4 = PURPLE_E
+        # Start of Pie Chart
         neither = Sector(outer_radius=r, fill_opacity=1, angle=-(a_neither+1)*DEGREES, start_angle=a_neither*DEGREES, color=c1)
         both = Sector(outer_radius=r, fill_opacity=1, angle=-(a_both+1)*DEGREES, start_angle=(a_neither+a_both)*DEGREES, color=c2)
         only_c = Sector(outer_radius=r, fill_opacity=1, angle=-(a_only_c+1)*DEGREES, start_angle=(a_neither+a_both+a_only_c)*DEGREES, color=c3)
         only_d = Sector(outer_radius=r, fill_opacity=1, angle=-(a_only_d+1)*DEGREES, start_angle=(a_neither+a_both+a_only_c+a_only_d)*DEGREES, color=c4)
         # for i in (neither, both, only_c, only_d): i.set_stroke(width=2, color=BLACK)
-        pie = Group(neither, both, only_c, only_d).rotate((180-a_neither)*DEGREES)
+        pie = Group(neither, both, only_c, only_d).rotate((180-a_neither)*DEGREES).shift([0, y_offset, 0])
 
-        l_neither = Tex('''Tidak ada\\\\(45.8\%)''', font_size=30).move_to([-3,2,0])
+        l_neither = Tex('''Tidak tahu\\\\(45.8\%)''', font_size=30).move_to([-3,2,0])
         l_both = Tex('''Dua-duanya\\\\(39.8\%)''', font_size=30).move_to([-3,-2,0])
         l_one_c = Tex('''Hanya terpusat\\\\(9.6\%)''', font_size=30).move_to([3.5,-1,0])
-        l_one_d = Tex('''Hanya terdesentralisasi\\\\(4.8\%)''', font_size=30).move_to([4,0.25,0])
-        labels = [l_neither,l_both, l_one_c, l_one_d]
+        l_one_d = Tex('''Hanya terdesentralisasi\\\\(4.8\%)''', font_size=30).move_to([4,0.75,0])
+        labels = [label.shift([0, y_offset, 0]) for label in (l_neither,l_both, l_one_c, l_one_d)]
         angles = [135, -135, -20, 7]
         boxes = []
         for index, i in enumerate(labels):
@@ -53,26 +52,26 @@ class SurveyData(Scene):
             boxes.append(line)
 
         self.add(pie)
-        block = Sector(outer_radius=r+0.1, fill_opacity=1, angle=361*DEGREES, color=BLACK).rotate((180-a_neither)*DEGREES)
+        pie_title = Tex('''Persentase responden yang mengetahui\\\\internet terpusat atau terdesentralisasi''', font_size=35).move_to([0, 2.5, 0])
+        block = Sector(outer_radius=r+0.1, fill_opacity=1, angle=361*DEGREES, color=BLACK).rotate((180-a_neither)*DEGREES).shift([0, y_offset, 0])
         self.add(block)
-        self.play(Uncreate(block, rate_func=smooth, run_time=2))
-        self.play(*[FadeIn(line) for line in labels], *[FadeIn(box) for box in boxes])
-        shifts = [[-3,0,0],[-3,0,0],[-5.5,-1,0],[-6,1.75,0]]
+        self.play(Write(pie_title), Uncreate(block, rate_func=linear, run_time=2), *[FadeIn(line) for line in labels], *[FadeIn(box) for box in boxes])
+        shifts = [[-3,0,0],[-3,0,0],[-5.5,-1,0],[-6,1.25,0]]
         animations = []
         for index, label in enumerate(labels):
             animations.append(ApplyMethod(label.shift, shifts[index]))
-        self.play(ApplyMethod(pie.shift, [-4,0,0]), *animations)
-
+        self.play(ApplyMethod(pie_title.shift, [-3.5,0,0]), ApplyMethod(pie.shift, [-4,0,0]), *animations)
+        # Start creating line graph
         neither_percentage = [0.39, 0.5, 0.11]
         one_percentage = [0.08, 0.75, 0.17]
         both_percentage = [0.12, 0.52, 0.36]
         y_axis = NumberLine(
-            x_range=[0, 80, 20],
-            unit_size=3/80,
+            x_range=[0, 100, 20],
+            unit_size=4/100,
             rotation=90 * DEGREES,
             label_direction=np.array([-1, 0, 0]),
             font_size=30
-        ).add_labels({0:Tex('0\%'), 20:Tex('20\%'), 40:Tex('40\%'), 60:Tex('60\%'), 80:Tex('80\%')})
+        ).add_labels({0:Tex('0\%'), 20:Tex('20\%'), 40:Tex('40\%'), 60:Tex('60\%'), 80:Tex('80\%'), 100:Tex('100\%')})
         y_axis_len = y_axis.x_range[1]*y_axis.unit_size
         y_axis.shift(np.array([0, y_axis_len/2, 0]))
         spacing = 2
@@ -83,22 +82,30 @@ class SurveyData(Scene):
             numbers_with_elongated_ticks=[1,3,5],
             longer_tick_multiple=100,
             font_size=30
-        ).add_labels({1:'Tidak', 3:'Sedikit', 5:'Iya'})
+        ).add_labels({1:'Tidak peduli', 3:'Peduli sedikit', 5:'Peduli'})
         x_axis_len = y_axis.x_range[1]*y_axis.unit_size
-        x_axis.shift(np.array([x_axis_len/2+1.5, 0, 0]))
+        x_axis.shift(np.array([x_axis_len/2+1, 0, 0]))
         lines = Group()
         for l, data in enumerate([neither_percentage, one_percentage, both_percentage]):
             for index, i in enumerate(data[:2]):
-                line = Line(np.array([spacing*index, i*(y_axis_len+y_axis.unit_size*20), 0]), 
-                               np.array([spacing*(index+1), data[index+1]*(y_axis_len+y_axis.unit_size*20), 0]),
+                line = Line(np.array([spacing*index, i*(y_axis_len), 0]),
+                               np.array([spacing*(index+1), data[index+1]*(y_axis_len), 0]),
                                color = [c1,c2,c3][l])
                 lines.add(line)
                 # print(line.get_start_and_end())
         lines.shift([spacing/2,0,0])
         lines.add(y_axis, x_axis)
-        lines.shift(np.array([1, -y_axis_len/2, 0]))
+        lines.shift(np.array([1, -y_axis_len/2+y_offset, 0]))
+        line_labels = Group(Group(Rectangle(height=0.15, width=0.3, color=c1, fill_opacity=1),
+                            Tex('''Tidak tahu''', font_size=20)).arrange(RIGHT, buff=0.1),
+                            Group(Rectangle(height=0.15, width=0.3, color=c2, fill_opacity=1),
+                            Tex('''Hanya satu''', font_size=20)).arrange(RIGHT, buff=0.1),
+                            Group(Rectangle(height=0.15, width=0.3, color=c3, fill_opacity=1),
+                            Tex('''Dua-duanya''', font_size=20)).arrange(RIGHT, buff=0.1)).arrange(RIGHT)
+        line_labels.move_to(lines.get_center() + np.array([0.5, 2, 0]))
+        line_title = Tex('''Persentase kepedulian responden\\\\berdasarkan pengetahuan tentang\\\\internet terpusat atau terdesentralisasi''', font_size=35).move_to(lines.get_center() + np.array([0, 3.5, 0]))
         self.play(*[Create(line, rate_func=linear) for index, line in enumerate(lines) if index%2==0 or index==len(lines)-1])
-        self.play(*[Create(line, rate_func=linear) for index, line in enumerate(lines) if index%2!=0 and index!=len(lines)-1])
+        self.play(FadeIn(line_labels), Write(line_title, run_time=0.5), *[Create(line, rate_func=linear) for index, line in enumerate(lines) if index%2!=0 and index!=len(lines)-1])
         self.wait(0.5)
 
 class Test(Scene):
