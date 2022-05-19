@@ -1,5 +1,6 @@
 from manim import *
 import math as m
+import random as ran
 import node
 
 def PoltoCar(r, theta):
@@ -111,8 +112,83 @@ class SurveyData(Scene):
         self.wait(0.5)
 
 class TransitionExplanation(Scene):
-    def constructor(self):
-        pass
+    def construct(self):
+        # Positions of all starting nodes
+        nodes=[[0,0],
+               [0,2],
+               [2,1],
+               [2.25,-1.75],
+               [0,-3],
+               [-2,-1],
+               [-3,1],
+               [-5,3],
+               [-6,0],
+               [-6,-2],
+               [-3.5,-1.5],
+               [4,-3],
+               [6,0],
+               [4,2],
+               [2,5],
+               [-7,5],
+               [-8,-2],
+               [-3,-5],
+               [2,-5],
+               [8,-5],
+               [8,3]]
+        # colors = [PURE_RED, PURE_GREEN, PURE_BLUE, YELLOW, WHITE, DARK_BROWN, DARKER_GREY, PINK]
+        
+        # Initiating each node
+        graph = []
+        for index, i in enumerate(nodes):
+            globals()[f'n{index}'] = node.Node(i)
+            graph.append(globals()[f'n{index}'])
+        n2.change_color(PURE_GREEN)
+        # Connecting nodes
+        n0.connect(n1,n18)
+        n1.connect(n6,n13)
+        n2.connect(n1,n3)
+        n3.connect(n0,n13)
+        n4.connect(n0,n10)
+        n5.connect(n4)
+        n7.connect(n6)
+        n8.connect(n14,n15,n16)
+        n9.connect(n8,n17)
+        n10.connect(n6,n7,n9)
+        n11.connect(n3)
+        n12.connect(n11,n19,n20)
+        n13.connect(n19)
+        n15.connect(n17)
+        n18.connect(n3)
+
+        # Show all nodes
+        shows = []
+        for i in graph:
+            shows.extend(i.show())
+        self.play(*shows)
+
+        # Upgrade some nodes
+        # n12.upgrade(self)
+        # n8.upgrade(self)
+        # n6.upgrade(self)
+        # n7.upgrade(self)
+        # n2.upgrade(self)
+        # n7.divide(self)
+        # n2.divide(self)
+
+        # Slowly shift all nodes
+        animations = []
+        for i in graph:
+            animations.append(i.node.animate.shift([1,1,0]))
+        self.play(*animations, rate_func=linear, run_time=5)
+        
+        animations = []
+        for index, i in enumerate(graph):
+            if index not in [0,1,3,4,18]:
+                animations.extend(i.remove(self))
+        self.play(*animations, n18.disconnect(n3,self), run_time=3)
+        self.play(n0.node.animate.move_to(ORIGIN), n1.node.animate.move_to([-2,2,0]), n3.node.animate.move_to([2,2,0]), n4.node.animate.move_to([-2,-2,0]), n18.node.animate.move_to([2,-2,0]))
+
+
 
 class CentralizedExplanation(Scene):
     def constructor(self):
@@ -168,9 +244,9 @@ class Test(Scene):
 class TestNode(Scene):
     def construct(self):
         # Testing the nodes
-        n = node.Node([0,0,0], WHITE, radius=0.5)
-        n1 = node.Node([0,0,0], WHITE, radius=0.5)
-        n2 = node.Node([0,-3,0], WHITE, radius=0.5)
+        n = node.Node([0,0], WHITE, radius=0.5)
+        n1 = node.Node([0,0], WHITE, radius=0.5)
+        n2 = node.Node([0,-3], WHITE, radius=0.5)
         # print(WHITE)
         n.node.shift([-3,3,0])
         n1.node.shift([0,0,0])
@@ -181,6 +257,7 @@ class TestNode(Scene):
         self.play(*n1.show())
         self.play(ApplyMethod(n1.node.shift, [1,1,0]), ApplyMethod(n.node.shift, [0,-1,0]))
         n1.upgrade(self)
+        n.upgrade(self)
         self.play(ApplyMethod(n.node.shift, [7, -5, 0]))
         n1.divide(self)
         self.play(ApplyMethod(n1.node.shift,[-3,0,0]))

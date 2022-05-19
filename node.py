@@ -124,7 +124,7 @@ def stickLine_server(line, server):
     elif line in server.end_edges.values():
         server_place = 0
         l1 = line.get_start()
-        l2 - serverC
+        l2 = serverC
     else:
         raise KeyError('line not in start_edges or end_edges')
 
@@ -139,15 +139,25 @@ def stickLine_server(line, server):
         # print(line.get_end(), 'line end')
 
 class Node():
-    def __init__(self, pos, color, radius=1):
+    def __init__(self, pos, color=WHITE, radius=0.5):
+        pos.append(0)
         self.color = color
         self.radius = radius
         self.node = Circle(radius=radius, color=color).move_to(np.array(pos))
         self.start_edges = {}
         self.end_edges = {}
         self.server = False
+        self.shown = False
+
+    def change_color(self, color):
+        self.color = color
+        if not self.shown:
+            self.node.set_color(color=color)
+        else:
+            return(self.node.animate.set_color(color=color))
 
     def show(self):
+        self.shown = True
         animations = []
         # print(scene)
         animations.append((FadeIn(self.node)))
@@ -160,20 +170,37 @@ class Node():
             print(repr(e))
 
         return animations
+
+    def remove(self, scene):
+        animations = []
+        start_edges = [*self.start_edges.keys()]
+        end_edges = [*self.end_edges.keys()]
+        for node in start_edges:
+            animations.append(self.disconnect(node, scene))
+        for node in end_edges:
+            animations.append(node.disconnect(self, scene))
+        animations.insert(0, FadeOut(self.node))
+        return animations
         
-    def connect(self, target):
+    def connect_to(self, target):
         line = Line()
         stickLine(line, self, target)
         line.add_updater(lambda l: stickLine(l, self, target))
         self.start_edges[target] = line
         target.end_edges[self] = line
 
+    def connect(self, *targets):
+        for target in targets:
+            self.connect_to(target)
+
+
     def disconnect(self, target, scene):
         try:
-            self.start_edges[target].clear_updaters()
-            scene.play(Uncreate(self.start_edges[target]))
+            line = self.start_edges[target]
+            line.clear_updaters()
             del self.start_edges[target]
             del target.end_edges[self]
+            return Uncreate(line)
         except KeyError:
             raise KeyError(f'{target} not connected to {self}')
 
@@ -191,7 +218,7 @@ class Node():
             print(repr(Exception))
             print('Target not connected to self')
 
-        data = Line().set_color_by_gradient([WHITE, rgb_to_color([0, 0, 1]), WHITE])
+        data = Line().set_color_by_gradient([WHITE, self.color, WHITE])
         start = stickLine2line(data, track, length, True and switch)
         data.put_start_and_end_on(start[0], start[1])
         scene.play(Create(data, rate_func=linear, run_time=length/speed))
@@ -249,7 +276,7 @@ class Node():
             squares = []
             for x in range(-1,2):
                 for y in range(-1,2):
-                    squares.append(Square(side_length=side).next_to(self.node, np.array([x,y,0]), buff=-side))
+                    squares.append(Square(side_length=side, color=self.color).next_to(self.node, np.array([x,y,0]), buff=-side))
             scene.play(*[FadeIn(square) for square in squares], run_time=0.1)
 
             # Remove the previous square
