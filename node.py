@@ -110,7 +110,7 @@ def intersect_rect(line_start, line_end, rect):
     elif not checkside(TL, BL, exp_l) and not checkside(line_start, line_end, exp_left):
         inter = intersection(exp_l, exp_left)
     else:
-        print('Something went wrong with finding the intersection')
+        raise RuntimeError("There's no intersection")
 
     return inter
 
@@ -126,7 +126,7 @@ def stickLine_server(line, server):
         l1 = line.get_start()
         l2 - serverC
     else:
-        print('something went wrong checking at end or start')
+        raise KeyError('line not in start_edges or end_edges')
 
     inter = intersect_rect(l1, l2, server.node)
 
@@ -168,8 +168,10 @@ class Node():
         self.start_edges[target] = line
         target.end_edges[self] = line
 
-    def disconnect(self, target):
+    def disconnect(self, target, scene):
         try:
+            self.start_edges[target].clear_updaters()
+            scene.play(FadeOut(self.start_edges[target]))
             del self.start_edges[target]
             del target.end_edges[self]
         except KeyError:
@@ -180,8 +182,11 @@ class Node():
             track = self.start_edges[target]
             switch = False
         except KeyError:
-            track = self.end_edges[target]
-            switch = True
+            try:
+                track = self.end_edges[target]
+                switch = True
+            except KeyError:
+                raise KeyError("Target isn't connected to self")
         except:
             print(repr(Exception))
             print('Target not connected to self')
