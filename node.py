@@ -155,7 +155,7 @@ class Node():
         # for line in self.start_edges.values():
         #     edge_animations.append(FadeIn(line))
         try:
-            animations.extend([FadeIn(line) for line in self.start_edges.values()])
+            animations.extend([Create(line) for line in self.start_edges.values()])
         except Exception as e:
             print(repr(e))
 
@@ -171,7 +171,7 @@ class Node():
     def disconnect(self, target, scene):
         try:
             self.start_edges[target].clear_updaters()
-            scene.play(FadeOut(self.start_edges[target]))
+            scene.play(Uncreate(self.start_edges[target]))
             del self.start_edges[target]
             del target.end_edges[self]
         except KeyError:
