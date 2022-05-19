@@ -168,6 +168,13 @@ class Node():
         self.start_edges[target] = line
         target.end_edges[self] = line
 
+    def disconnect(self, target):
+        try:
+            del self.start_edges[target]
+            del target.end_edges[self]
+        except KeyError:
+            raise KeyError(f'{target} not connected to {self}')
+
     def send(self, target, scene, length=1, speed=5):
         try:
             track = self.start_edges[target]
