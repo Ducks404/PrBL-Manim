@@ -12,7 +12,31 @@ def hyp(a, b):
     c = m.sqrt(a**2+b**2)
     return(c)
 
-# circle.get_center
+class SurveyData(Scene):
+    def construct(self):
+        a_neither = 45.8 / 100 * 360
+        a_both = 39.8 / 100 * 360
+        a_only_c = 9.6 / 100 * 360
+        a_only_d = 4.8 / 100 * 360
+        r = 1.5
+        green = "#81b29a"
+        blue = "#454866"
+        red = "#e07a5f"
+        c1 = RED_E
+        c2 = GREEN_E
+        c3 = YELLOW_C
+        c4 = PURPLE_E
+        neither = Sector(outer_radius=r, fill_opacity=1, angle=-(a_neither+1)*DEGREES, start_angle=a_neither*DEGREES, color=c1)
+        both = Sector(outer_radius=r, fill_opacity=1, angle=-(a_both+1)*DEGREES, start_angle=(a_neither+a_both)*DEGREES, color=c2)
+        only_c = Sector(outer_radius=r, fill_opacity=1, angle=-(a_only_c+1)*DEGREES, start_angle=(a_neither+a_both+a_only_c)*DEGREES, color=c3)
+        only_d = Sector(outer_radius=r, fill_opacity=1, angle=-(a_only_d+1)*DEGREES, start_angle=(a_neither+a_both+a_only_c+a_only_d)*DEGREES, color=c4)
+        # for i in (neither, both, only_c, only_d): i.set_stroke(width=2, color=BLACK)
+        pie = Group(neither, both, only_c, only_d)
+        self.add(pie)
+        block = Sector(outer_radius=r+0.1, fill_opacity=1, angle=361*DEGREES, color=BLACK)
+        self.add(block)
+        self.play(Uncreate(block, rate_func=smooth, run_time=2))
+        self.play(pie.animate.shift([-2,0,0]))
 
 class Test(Scene):
     def construct(self):
