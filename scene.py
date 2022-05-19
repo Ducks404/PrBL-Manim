@@ -110,6 +110,34 @@ class SurveyData(Scene):
         self.play(FadeIn(line_labels), Write(line_title, run_time=0.5), *[Create(line, rate_func=linear) for index, line in enumerate(lines) if index%2!=0 and index!=len(lines)-1])
         self.wait(0.5)
 
+class TransitionExplanation(Scene):
+    def constructor(self):
+        pass
+
+class CentralizedExplanation(Scene):
+    def constructor(self):
+        pass
+
+class DecentralizedExplanation(Scene):
+    def constructor(self):
+        pass
+
+class MoreSurveyData(Scene):
+    def constructor(self):
+        pass
+
+class CurrentInternet(Scene):
+    def constructor(self):
+        pass
+
+class FutureInternet(Scene):
+    def construcotr(self):
+        pass
+
+class Credits(Scene):
+    def constructor(self):
+        pass
+
 class Test(Scene):
     def construct(self):
         circle = Circle(radius=0.5)
