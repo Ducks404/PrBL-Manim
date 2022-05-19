@@ -3,7 +3,7 @@
 - Intro of google earth flying up to title "Keadaan Internet: Sistem Terpusat vs Terdesentralisasi"
 - Background of earth spinning and a node graph representing a network
 
-// Survey data
+// Survey data ✔
 - Pie chart of how much knows centralized or decentralized is
 - Knowledge vs Care graph
 
