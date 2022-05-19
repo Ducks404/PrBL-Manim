@@ -14,6 +14,9 @@ def hyp(a, b):
 
 class SurveyData(Scene):
     def construct(self):
+        for x in range(-7, 8):
+            for y in range(-4, 5):
+                self.add(Dot(np.array([x, y, 0]), color=DARK_GREY))
         a_neither = 45.8 / 100 * 360
         a_both = 39.8 / 100 * 360
         a_only_c = 9.6 / 100 * 360
@@ -36,7 +39,45 @@ class SurveyData(Scene):
         block = Sector(outer_radius=r+0.1, fill_opacity=1, angle=361*DEGREES, color=BLACK)
         self.add(block)
         self.play(Uncreate(block, rate_func=smooth, run_time=2))
-        self.play(pie.animate.shift([-2,0,0]))
+        self.play(pie.animate.shift([-4,0,0]))
+
+        neither_percentage = [0.39, 0.5, 0.11]
+        one_percentage = [0.08, 0.75, 0.17]
+        both_percentage = [0.12, 0.52, 0.36]
+        y_axis = NumberLine(
+            x_range=[0, 80, 20],
+            unit_size=3/80,
+            rotation=90 * DEGREES,
+            label_direction=np.array([-1, 0, 0]),
+            font_size=30
+        ).add_labels({0:Tex('0\%'), 20:Tex('20\%'), 40:Tex('40\%'), 60:Tex('60\%'), 80:Tex('80\%')})
+        y_axis_len = y_axis.x_range[1]*y_axis.unit_size
+        y_axis.shift(np.array([0, y_axis_len/2, 0]))
+        spacing = 2
+        x_axis =NumberLine(
+            x_range=[0, 6, 1],
+            unit_size=spacing/2,
+            tick_size=0.001,
+            numbers_with_elongated_ticks=[1,3,5],
+            longer_tick_multiple=100,
+            font_size=30
+        ).add_labels({1:'Tidak', 3:'Sedikit', 5:'Iya'})
+        x_axis_len = y_axis.x_range[1]*y_axis.unit_size
+        x_axis.shift(np.array([x_axis_len/2+1.5, 0, 0]))
+        lines = Group()
+        for l, data in enumerate([neither_percentage, one_percentage, both_percentage]):
+            for index, i in enumerate(data[:2]):
+                line = Line(np.array([spacing*index, i*(y_axis_len+y_axis.unit_size*20), 0]), 
+                               np.array([spacing*(index+1), data[index+1]*(y_axis_len+y_axis.unit_size*20), 0]),
+                               color = [c1,c2,c3][l])
+                lines.add(line)
+                # print(line.get_start_and_end())
+        lines.shift([spacing/2,0,0])
+        lines.add(y_axis, x_axis)
+        lines.shift(np.array([0, -y_axis_len/2, 0]))
+        self.play(*[Create(line, rate_func=linear) for index, line in enumerate(lines) if index%2==0 or index==len(lines)-1])
+        self.play(*[Create(line, rate_func=linear) for index, line in enumerate(lines) if index%2!=0 and index!=len(lines)-1])
+        self.wait(0.5)
 
 class Test(Scene):
     def construct(self):
