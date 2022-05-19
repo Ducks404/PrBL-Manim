@@ -22,11 +22,12 @@ class SurveyData(Scene):
         a_only_c = 9.6 / 100 * 360
         a_only_d = 4.8 / 100 * 360
         r = 1.5
-        y_offset = -1
+        y_offset = -0.75
         c1 = RED_E
         c2 = GREEN_E
         c3 = YELLOW_C
         c4 = PURPLE_E
+
         # Start of Pie Chart
         neither = Sector(outer_radius=r, fill_opacity=1, angle=-(a_neither+1)*DEGREES, start_angle=a_neither*DEGREES, color=c1)
         both = Sector(outer_radius=r, fill_opacity=1, angle=-(a_both+1)*DEGREES, start_angle=(a_neither+a_both)*DEGREES, color=c2)
@@ -52,15 +53,16 @@ class SurveyData(Scene):
             boxes.append(line)
 
         self.add(pie)
-        pie_title = Tex('''Persentase responden yang mengetahui\\\\internet terpusat atau terdesentralisasi''', font_size=35).move_to([0, 2.5, 0])
+        pie_title = Tex('''Persentase responden yang mengetahui\\\\internet terpusat atau terdesentralisasi''', font_size=35).move_to([0, 2.75, 0])
         block = Sector(outer_radius=r+0.1, fill_opacity=1, angle=361*DEGREES, color=BLACK).rotate((180-a_neither)*DEGREES).shift([0, y_offset, 0])
         self.add(block)
         self.play(Write(pie_title), Uncreate(block, rate_func=linear, run_time=2), *[FadeIn(line) for line in labels], *[FadeIn(box) for box in boxes])
-        shifts = [[-3,0,0],[-3,0,0],[-5.5,-1,0],[-6,1.25,0]]
+        shifts = [[-2.75,0,0],[-2.75,0,0],[-4.75,-0.25,0],[-5.75,1,0]]
         animations = []
         for index, label in enumerate(labels):
             animations.append(ApplyMethod(label.shift, shifts[index]))
-        self.play(ApplyMethod(pie_title.shift, [-3.5,0,0]), ApplyMethod(pie.shift, [-4,0,0]), *animations)
+        self.play(ApplyMethod(pie_title.shift, [-3.25,0,0]), ApplyMethod(pie.shift, [-4,0,0]), *animations)
+
         # Start creating line graph
         neither_percentage = [0.39, 0.5, 0.11]
         one_percentage = [0.08, 0.75, 0.17]
