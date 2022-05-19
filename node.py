@@ -74,27 +74,16 @@ def intersection(e1, e2):
     y = e1[0] * x + e1[1]
     return np.array([round(x,2), round(y,2), 0])
 
-
-def stickLine_server(line, server):
-    serverC = server.node.get_center()
-    # Check if the server is at the end or start
-    if line in server.start_edges.values():
-        server_place = 1
-        l1 = serverC
-        l2 = line.get_end()
-    elif line in server.end_edges.values():
-        server_place = 0
-        l1 = line.get_start()
-        l2 - serverC
-    else:
-        print('something went wrong checking at end or start')
-    side = server.node.side_length/2
-    TL = serverC + np.array([-side, side, 0])
-    TR = serverC + np.array([side, side, 0])
-    BL = serverC + np.array([-side, -side, 0])
-    BR = serverC + np.array([side, -side, 0])
+def intersect_rect(line_start, line_end, rect):
+    height = rect.height/2
+    width = rect.width/2
+    rectC = rect.get_center()
+    TL = rectC + np.array([-width, height, 0])
+    TR = rectC + np.array([width, height, 0])
+    BL = rectC + np.array([-width, -height, 0])
+    BR = rectC + np.array([width, -height, 0])
     
-    exp_l = lexpression(l1, l2)
+    exp_l = lexpression(line_start, line_end)
     exp_up = lexpression(TL, TR)
     exp_right = lexpression(TR, BR)
     exp_down = lexpression(BL, BR)
@@ -112,16 +101,34 @@ def stickLine_server(line, server):
     5. find the intersection if there is one.
     '''
     # Find the intersection
-    if not checkside(TL, TR, exp_l) and not checkside(l1, l2, exp_up):
+    if not checkside(TL, TR, exp_l) and not checkside(line_start, line_end, exp_up):
         inter = intersection(exp_l, exp_up)
-    elif not checkside(TR, BR, exp_l) and not checkside(l1, l2, exp_right):
+    elif not checkside(TR, BR, exp_l) and not checkside(line_start, line_end, exp_right):
         inter = intersection(exp_l, exp_right)
-    elif not checkside(BL, BR, exp_l) and not checkside(l1, l2, exp_down):
+    elif not checkside(BL, BR, exp_l) and not checkside(line_start, line_end, exp_down):
         inter = intersection(exp_l, exp_down)
-    elif not checkside(TL, BL, exp_l) and not checkside(l1, l2, exp_left):
+    elif not checkside(TL, BL, exp_l) and not checkside(line_start, line_end, exp_left):
         inter = intersection(exp_l, exp_left)
     else:
         print('Something went wrong with finding the intersection')
+
+    return inter
+
+def stickLine_server(line, server):
+    serverC = server.node.get_center()
+    # Check if the server is at the end or start
+    if line in server.start_edges.values():
+        server_place = 1
+        l1 = serverC
+        l2 = line.get_end()
+    elif line in server.end_edges.values():
+        server_place = 0
+        l1 = line.get_start()
+        l2 - serverC
+    else:
+        print('something went wrong checking at end or start')
+
+    inter = intersect_rect(l1, l2, server.node)
 
     # Check if the server is at the end or start
     if server_place:

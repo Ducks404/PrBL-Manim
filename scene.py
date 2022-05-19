@@ -6,7 +6,7 @@ def PoltoCar(r, theta):
     theta = m.radians(theta)
     x = round(r * m.cos(theta),2)
     y = round(r * m.sin(theta), 2)
-    return({'x':x,'y':y})
+    return np.array([x,y,0])
 
 def hyp(a, b):
     c = m.sqrt(a**2+b**2)
@@ -14,9 +14,9 @@ def hyp(a, b):
 
 class SurveyData(Scene):
     def construct(self):
-        for x in range(-7, 8):
-            for y in range(-4, 5):
-                self.add(Dot(np.array([x, y, 0]), color=DARK_GREY))
+        # for x in range(-7, 8):
+        #     for y in range(-4, 5):
+        #         self.add(Dot(np.array([x, y, 0]), color=DARK_GREY))
         a_neither = 45.8 / 100 * 360
         a_both = 39.8 / 100 * 360
         a_only_c = 9.6 / 100 * 360
@@ -34,12 +34,34 @@ class SurveyData(Scene):
         only_c = Sector(outer_radius=r, fill_opacity=1, angle=-(a_only_c+1)*DEGREES, start_angle=(a_neither+a_both+a_only_c)*DEGREES, color=c3)
         only_d = Sector(outer_radius=r, fill_opacity=1, angle=-(a_only_d+1)*DEGREES, start_angle=(a_neither+a_both+a_only_c+a_only_d)*DEGREES, color=c4)
         # for i in (neither, both, only_c, only_d): i.set_stroke(width=2, color=BLACK)
-        pie = Group(neither, both, only_c, only_d)
+        pie = Group(neither, both, only_c, only_d).rotate((180-a_neither)*DEGREES)
+
+        l_neither = Tex('''Tidak ada\\\\(45.8\%)''', font_size=30).move_to([-3,2,0])
+        l_both = Tex('''Dua-duanya\\\\(39.8\%)''', font_size=30).move_to([-3,-2,0])
+        l_one_c = Tex('''Hanya terpusat\\\\(9.6\%)''', font_size=30).move_to([3.5,-1,0])
+        l_one_d = Tex('''Hanya terdesentralisasi\\\\(4.8\%)''', font_size=30).move_to([4,0.25,0])
+        labels = [l_neither,l_both, l_one_c, l_one_d]
+        angles = [135, -135, -20, 7]
+        boxes = []
+        for index, i in enumerate(labels):
+            box = Rectangle(width=i.width, height=i.height).set_stroke(width=0).move_to(i.get_center())
+            box.add_updater(lambda box, index=index: box.move_to(labels[index].get_center()))
+            boxes.append(box)
+            inter = node.intersect_rect(pie.get_center(), box.get_center(), box)
+            line = Line(pie.get_center()+PoltoCar(r+0.1, angles[index]), inter).set_stroke(width=2)
+            line.add_updater(lambda line, index=index, box=box: line.put_start_and_end_on(pie.get_center()+PoltoCar(r+0.1, angles[index]), node.intersect_rect(line.get_start(), box.get_center(), box)))
+            boxes.append(line)
+
         self.add(pie)
-        block = Sector(outer_radius=r+0.1, fill_opacity=1, angle=361*DEGREES, color=BLACK)
+        block = Sector(outer_radius=r+0.1, fill_opacity=1, angle=361*DEGREES, color=BLACK).rotate((180-a_neither)*DEGREES)
         self.add(block)
         self.play(Uncreate(block, rate_func=smooth, run_time=2))
-        self.play(pie.animate.shift([-4,0,0]))
+        self.play(*[FadeIn(line) for line in labels], *[FadeIn(box) for box in boxes])
+        shifts = [[-3,0,0],[-3,0,0],[-5.5,-1,0],[-6,1.75,0]]
+        animations = []
+        for index, label in enumerate(labels):
+            animations.append(ApplyMethod(label.shift, shifts[index]))
+        self.play(ApplyMethod(pie.shift, [-4,0,0]), *animations)
 
         neither_percentage = [0.39, 0.5, 0.11]
         one_percentage = [0.08, 0.75, 0.17]
@@ -74,7 +96,7 @@ class SurveyData(Scene):
                 # print(line.get_start_and_end())
         lines.shift([spacing/2,0,0])
         lines.add(y_axis, x_axis)
-        lines.shift(np.array([0, -y_axis_len/2, 0]))
+        lines.shift(np.array([1, -y_axis_len/2, 0]))
         self.play(*[Create(line, rate_func=linear) for index, line in enumerate(lines) if index%2==0 or index==len(lines)-1])
         self.play(*[Create(line, rate_func=linear) for index, line in enumerate(lines) if index%2!=0 and index!=len(lines)-1])
         self.wait(0.5)
