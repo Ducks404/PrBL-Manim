@@ -204,7 +204,7 @@ class Node():
         except KeyError:
             raise KeyError(f'{target} not connected to {self}')
 
-    def send(self, target, scene, length=1, speed=5):
+    def send(self, target, scene, length=1, speed=3, color=None):
         try:
             track = self.start_edges[target]
             switch = False
@@ -217,25 +217,28 @@ class Node():
         except:
             print(repr(Exception))
             print('Target not connected to self')
+        data = Line().set_color_by_gradient([WHITE, color, WHITE] if color else [WHITE, self.color, WHITE])
+        data_dot = Dot(color=color)
 
-        data = Line().set_color_by_gradient([WHITE, self.color, WHITE])
         start = stickLine2line(data, track, length, True and switch)
         data.put_start_and_end_on(start[0], start[1])
-        scene.play(Create(data, rate_func=linear, run_time=length/speed))
+        scene.add(data_dot)
+        scene.play(Create(data, rate_func=linear), ApplyMethod(data_dot.move_to, data.get_center(), rate_func=linear), run_time=length/speed)
 
         des_buff = get_length(data.get_start(), data.get_end())/2
         des = stickLine2line(data, track, des_buff, not (True and switch))[1]
         len_move = get_length((start[0]+start[1])/2, des)
-        scene.play(ApplyMethod(data.move_to, des, rate_func=linear, run_time=len_move/speed))
+        scene.play(ApplyMethod(data.move_to, des, rate_func=linear), ApplyMethod(data_dot.move_to, des), run_time=len_move/speed)
 
         data.rotate(180*DEGREES)
-        scene.play(Uncreate(data, rate_func=linear, run_time=length/speed))
+        scene.play(Uncreate(data, rate_func=linear), ApplyMethod(data_dot.move_to, track.get_end() if switch else track.get_start()), run_time=length/speed)
+        scene.remove(data_dot)
 
     def send_through(self, route, scene, length=1, speed=5):
         route.insert(0, self)
         for index, node in enumerate(route):
             if index != len(route)-1:
-                node.send(route[index+1], scene, length, speed)
+                node.send(route[index+1], scene, length, speed, self.color)
 
     def upgrade(self, scene):
         # Transform circle to square and replaces self.node

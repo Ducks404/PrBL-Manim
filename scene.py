@@ -13,6 +13,9 @@ def hyp(a, b):
     c = m.sqrt(a**2+b**2)
     return(c)
 
+class TitleScreen(Scene):
+    def construct(self):
+        title = Tex('''Keadaan Internet''')
 class SurveyData(Scene):
     def construct(self):
         # for x in range(-7, 8):
@@ -191,19 +194,89 @@ class TransitionExplanation(Scene):
 
 
 class CentralizedExplanation(Scene):
-    def constructor(self):
-        pass
+    def construct(self):
+        title = Tex('''Terpusat''').move_to([0,3,0])
+        node_pos = [[0,0],
+                    [2,2],
+                    [2,-2],
+                    [-2,-2],
+                    [-2,2]]
+        # Initiating each node
+        graph = []
+        for index, i in enumerate(node_pos):
+            globals()[f'n{index}'] = node.Node(i)
+            graph.append(globals()[f'n{index}'])
+        
+        # Connect all nodes to center node
+        for i in graph[1:]:
+            i.connect(n0)
+        
+        # Show all nodes
+        shows = []
+        for i in graph:
+            shows.extend(i.show())
+        self.play(*shows)
+        self.play(Write(title))
+
+        n0.upgrade(self)
+        server = Text('''Server''', font_size=28, color='#6e6e6e').move_to([0,2,0])
+        arrow = Arrow(start=[0,1.75,0],end=[0,0.75,0], color='#6e6e6e')
+        self.play(Write(server), Create(arrow))
+
+        data1 = Tex('''0b0111\\\\001101\\\\100101''', font_size=23)
+        data2 = Tex('''0b0111\\\\001001\\\\110110''', font_size=23)
+        data3 = Tex('''0b0110\\\\010101\\\\110010''', font_size=23)
+        
+        self.play(Write(data1), run_time=0.5)
+        self.play(ReplacementTransform(data1, data2), run_time=0.5)
+        self.play(ReplacementTransform(data2, data3), run_time=0.5)
+        self.play(Unwrite(data3), Unwrite(server), Uncreate(arrow), run_time=0.5)
+
+        self.play(n3.change_color(PURE_BLUE), n2.change_color(PURE_RED), n1.change_color(YELLOW), n4.change_color(LIGHT_BROWN))
+        n3.send_through([n0,n2], self)
+        n2.send(n0, self)
+        n4.send(n0, self)
+        n0.send(n3, self, color=n2.color)
+
+        add_node = [[0,-3],
+                    [3,0],
+                    [-3,0]]
+
+        # Initiating each node
+        graph = []
+        colors = [PURE_GREEN, LIGHTER_GRAY, RED]
+        for index, i in enumerate(add_node):
+            globals()[f'n{index+5}'] = node.Node(i, color=colors[index])
+            graph.append(globals()[f'n{index+5}'])
+
+        
+        # Connect all nodes to center node
+        for i in graph:
+            i.connect(n0)
+        
+        # Show all nodes
+        shows = []
+        for i in graph:
+            shows.extend(i.show())
+        self.play(*shows)
+        
+        n0.send(n6, self, color=n4.color)
+        n5.send_through([n0,n7], self)
+        n3.send_through([n0,n7], self)
+        n7.send_through([n0,n3], self)
+        n7.send_through([n0,n5,n0,n2], self)
+
 
 class DecentralizedExplanation(Scene):
-    def constructor(self):
+    def construct(self):
         pass
 
 class MoreSurveyData(Scene):
-    def constructor(self):
+    def construct(self):
         pass
 
 class CurrentInternet(Scene):
-    def constructor(self):
+    def construct(self):
         pass
 
 class FutureInternet(Scene):
@@ -211,8 +284,12 @@ class FutureInternet(Scene):
         pass
 
 class Credits(Scene):
-    def constructor(self):
+    def construct(self):
         pass
+
+'''
+Tests might break since I changed stuff throughout doing the actual pugs
+'''
 
 class Test(Scene):
     def construct(self):
