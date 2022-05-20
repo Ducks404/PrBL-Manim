@@ -318,6 +318,8 @@ class CentralizedExplanation(Scene):
 
 class DecentralizedExplanation(Scene):
     def construct(self):
+        prev_title = Tex('''Terpusat''').move_to([0,3,0])
+        title = Tex('''Terdesentralisasi''').move_to([-0.5,3,0])
         nodes = [([0,0],WHITE),
                  ([2,2],YELLOW),
                  ([3,0],LIGHTER_GRAY),
@@ -333,7 +335,7 @@ class DecentralizedExplanation(Scene):
         shows=[]
         for i in graph:
             shows.extend(i.show())
-        self.play(*shows)
+        self.play(*shows, Write(prev_title))
         graph[0].upgrade(self)
         
             
@@ -354,7 +356,8 @@ class DecentralizedExplanation(Scene):
         animations = []
         for index, n in enumerate(graph):
             animations.append(n.node.animate.move_to(node_pos[index]+[0]))
-        self.play(*animations)
+        self.play(*animations, ReplacementTransform(prev_title, title))
+        self.play(title.animate.shift([0,0.5,0]))
         animations = []
         
         animations.extend([graph[0].disconnect(graph[3],self),
@@ -388,8 +391,8 @@ class DecentralizedExplanation(Scene):
         self.wait(0.5)
 
         graph[3].send_through([graph[12],graph[2],graph[0],graph[7]], self)
-        graph[6].send_through([graph[10],graph[9],graph[8],graph[7],graph[0],graph[13]], self)
-        graph[4].send_through([graph[11],graph[12]], self)
+        graph[10].send_through([graph[9],graph[8],graph[7],graph[0],graph[13]], self)
+        graph[4].send_through([graph[11],graph[12],graph[2],graph[0],graph[13],graph[1]], self)
 
 class Examples(Scene):
     def construct(self):
