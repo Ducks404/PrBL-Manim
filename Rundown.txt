@@ -24,14 +24,14 @@
 - Centralized and Decentralized side by side in boxes 
 - List under the boxes
 
-// More survey data
+// More survey data ✔
 - Bar graph of 1 through 5
 - Lock in front of something to represent data in 1 side
 - No crime sign in 5 side
 - Possible represent contoh masalah
 - Balance scale
 
-// Current Internet
+// Current Internet ✔
 - Starting with decentralized graph
 - Add a bunch of nodes and servers
 - Divide servers to data centers

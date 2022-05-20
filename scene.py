@@ -428,9 +428,96 @@ class MoreSurveyData(Scene):
         ).shift([0,0.75,0])
         self.play(Create(chart), Centralized.animate.shift([0.5,-3.25,0]), Decentralized.animate.shift([-0.5,-3.25,0]))
 
-class CurrentInternet(Scene):
+class CurrentInternet(MovingCameraScene):
     def construct(self):
-        pass
+        node_pos = [[1,1],
+                    [2,3],
+                    [4,1],
+                    [3,-2],
+                    [0,-3],
+                    [-1,-1],
+                    [-3,0],
+                    [-2,2],
+                    [-5,3],
+                    [-6,0],
+                    [-4,-2],
+                    [5,-3],
+                    [6,-1],
+                    [6,3]]
+        graph = []
+        colors = [RED, PURE_RED, PURE_BLUE, PURE_GREEN, YELLOW, DARK_BROWN]
+        for i in node_pos:
+            graph.append(node.Node(i, ran.choice(colors)))
+
+        graph[3].connect(graph[4])
+        graph[4].connect(graph[2], graph[11])
+        graph[5].connect(graph[6])
+        graph[8].connect(graph[1], graph[7])
+        graph[9].connect(graph[8], graph[7], graph[10])
+        graph[10].connect(graph[6], graph[5])
+        graph[12].connect(graph[11],graph[3],graph[2],graph[13])
+        graph[13].connect(graph[0], graph[1])
+
+        for i in range(-9,10,3):
+            for j in range(-6,7,3):
+                if i==-9 or i==9 or j==-6 or j==6:
+                    graph.append(node.Node([i*5,j*5], ran.choice(colors)))
+
+        graph[10].connect(graph[14], graph[15], graph[16])
+        graph[9].connect(graph[16], graph[17])
+        graph[8].connect(graph[17], graph[18], graph[20])
+        graph[1].connect(graph[22],graph[24],graph[26])
+        graph[13].connect(graph[26],graph[28])
+        graph[11].connect(graph[29], graph[30])
+
+        shows=[]
+        for i in graph:
+            shows.extend(i.show())
+        self.play(*shows)
+
+        self.camera.frame.save_state()
+        self.play(self.camera.frame.animate.set(width=30))
+        self.wait(0.3)
+        self.play(Restore(self.camera.frame))
+
+        for i in range(2,11):
+            graph[i].upgrade(self, run_time=0.1)
+
+        for i in range(5,11):
+            graph[i].divide(self)
+        pusat = Text('''Pusat\nData''', font_size=28, color='#6e6e6e').move_to([-0.5,0.5,0])
+        arrow = Arrow(start=[-1,0.5,0], end=[-2.5,0.25,0], color='#6e6e6e')
+        self.play(FadeIn(pusat), FadeIn(arrow))
+        self.wait(0.5)
+        self.play(FadeOut(pusat), FadeOut(arrow))
+
+        sq_main = Square(side_length=2)
+        c = ORIGIN
+        line1 = Line(start=c, end=UP)
+        line2 = Line(start=c, end=DOWN)
+        line3 = Line(start=c, end=LEFT)
+        line4 = Line(start=c, end=RIGHT)
+
+        sq1 = Square(side_length=1).shift(UL/2)
+        sq2 = Square(side_length=1).next_to(sq1, direction = RIGHT, buff = 0)
+        sq3 = Square(side_length=1).next_to(sq1, direction = DOWN, buff = 0)
+        sq4 = Square(side_length=1).next_to(sq2, direction = DOWN, buff = 0)
+        self.add(sq_main)
+        self.wait(1)
+        self.play(Create(line1), Create(line2), Create(line3), Create(line4))
+        self.add(sq1, sq2, sq3, sq4)
+        self.remove(sq_main, line1, line2, line3, line4)
+        temp = Square(side_length=0).move_to([1,1,0])
+        self.play(AnimationGroup(Transform(sq1, temp),
+                  Transform(sq2, temp),
+                  Transform(sq3, temp),
+                  Transform(sq4, temp), lag_ratio=0.5))
+        graph[0].send(graph[13],self)
+        graph[0].send(graph[13],self)
+        graph[0].send(graph[13],self)
+        graph[0].send(graph[13],self)
+
+        self.play(self.camera.frame.animate.set(width=30))
 
 class FutureInternet(Scene):
     def construcotr(self):

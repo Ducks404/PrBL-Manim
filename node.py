@@ -238,12 +238,12 @@ class Node():
             if index != len(route)-1:
                 node.send(route[index+1], scene, length, speed, self.color)
 
-    def upgrade(self, scene):
+    def upgrade(self, scene, **kwargs):
         # Transform circle to square and replaces self.node
         x = self.node.get_x()
         y = self.node.get_y()
         temp = Square(side_length=self.radius*2, color=self.color).shift(np.array([x, y, 0]))
-        scene.play(ReplacementTransform(self.node, temp))
+        scene.play(ReplacementTransform(self.node, temp, **kwargs))
         self.node = temp
         self.server = True
 
