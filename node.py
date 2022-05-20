@@ -126,7 +126,8 @@ def stickLine_server(line, server):
         l1 = line.get_start()
         l2 = serverC
     else:
-        raise KeyError('line not in start_edges or end_edges')
+        return
+    #     raise KeyError(f'{line} not in start_edges or end_edges of {server.node.get_center()}')
 
     inter = intersect_rect(l1, l2, server.node)
 
@@ -218,21 +219,18 @@ class Node():
             print(repr(Exception))
             print('Target not connected to self')
         data = Line().set_color_by_gradient([WHITE, color, WHITE] if color else [WHITE, self.color, WHITE])
-        data_dot = Dot(color=color)
 
         start = stickLine2line(data, track, length, True and switch)
         data.put_start_and_end_on(start[0], start[1])
-        scene.add(data_dot)
-        scene.play(Create(data, rate_func=linear), ApplyMethod(data_dot.move_to, data.get_center(), rate_func=linear), run_time=length/speed)
+        scene.play(Create(data, rate_func=linear), run_time=length/speed)
 
         des_buff = get_length(data.get_start(), data.get_end())/2
         des = stickLine2line(data, track, des_buff, not (True and switch))[1]
         len_move = get_length((start[0]+start[1])/2, des)
-        scene.play(ApplyMethod(data.move_to, des, rate_func=linear), ApplyMethod(data_dot.move_to, des), run_time=len_move/speed)
+        scene.play(ApplyMethod(data.move_to, des, rate_func=linear), run_time=len_move/speed)
 
         data.rotate(180*DEGREES)
-        scene.play(Uncreate(data, rate_func=linear), ApplyMethod(data_dot.move_to, track.get_end() if switch else track.get_start()), run_time=length/speed)
-        scene.remove(data_dot)
+        scene.play(Uncreate(data, rate_func=linear), run_time=length/speed)
 
     def send_through(self, route, scene, length=1, speed=5):
         route.insert(0, self)

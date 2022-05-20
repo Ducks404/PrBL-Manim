@@ -15,7 +15,54 @@ def hyp(a, b):
 
 class TitleScreen(Scene):
     def construct(self):
-        title = Tex('''Keadaan Internet''')
+        '''
+        title = Tex('Internet').move_to([0,-1,0]).scale(2)
+        node_pos = [[1,1],
+                    [-3,0],
+                    [-3,-2],
+                    [-5,-2],
+                    [-6,-1],
+                    [-5,2],
+                    [-2,3],
+                    [2,3],
+                    [3,0],
+                    [5.5,2.5],
+                    [6,-1],
+                    [3,-2],
+                    [5,-3]]
+        # Initiating each node
+        graph = []
+        for index, i in enumerate(node_pos):
+            globals()[f'n{index}'] = node.Node(i)
+            graph.append(globals()[f'n{index}'])
+        
+        n0.connect(n1,n6,n7,n8)
+        n1.connect(n2,n3,n5,n6)
+        n2.connect(n3)
+        n3.connect(n4)
+        n4.connect(n5)
+        n5.connect(n6)
+        n6.connect(n7)
+        n7.connect(n8,n9)
+        n8.connect(n9,n10,n11)
+        n9.connect(n10)
+        n10.connect(n11,n12)
+        n11.connect(n12)
+
+        # Show all nodes
+        shows = []
+        for i in graph:
+            shows.extend(i.show())
+        self.play(*shows, Write(title))
+        '''
+        Title = Text('Keadaan Internet:')
+        Middle = Text('Sistem Terpusat')
+        vs = Text('melawan')
+        Down = Text('Terdesentralisasi')
+        title = VGroup(Title, Middle, vs, Down).arrange(DOWN)
+        self.play(Create(title), run_time=3)
+
+
 class SurveyData(Scene):
     def construct(self):
         # for x in range(-7, 8):
@@ -57,7 +104,7 @@ class SurveyData(Scene):
             boxes.append(line)
 
         self.add(pie)
-        pie_title = Tex('''Persentase responden yang mengetahui\\\\internet terpusat atau terdesentralisasi''', font_size=35).move_to([0, 2.75, 0])
+        pie_title = Tex('''Persentase responden yang mengetahui\\\\internet terpusat atau terdesentralisasi''', font_size=35).move_to([0, 2.5, 0])
         block = Sector(outer_radius=r+0.1, fill_opacity=1, angle=361*DEGREES, color=BLACK).rotate((180-a_neither)*DEGREES).shift([0, y_offset, 0])
         self.add(block)
         self.play(Write(pie_title), Uncreate(block, rate_func=linear, run_time=2), *[FadeIn(line) for line in labels], *[FadeIn(box) for box in boxes])
@@ -138,30 +185,30 @@ class TransitionExplanation(Scene):
                [2,-5],
                [8,-5],
                [8,3]]
-        # colors = [PURE_RED, PURE_GREEN, PURE_BLUE, YELLOW, WHITE, DARK_BROWN, DARKER_GREY, PINK]
+        colors = [PURE_RED, PURE_GREEN, PURE_BLUE, YELLOW]
         
         # Initiating each node
         graph = []
         for index, i in enumerate(nodes):
-            globals()[f'n{index}'] = node.Node(i)
+            globals()[f'n{index}'] = node.Node(i, color=ran.choice(colors))
             graph.append(globals()[f'n{index}'])
-        n2.change_color(PURE_GREEN)
+        # n2.change_color(PURE_GREEN)
         # Connecting nodes
-        n0.connect(n1,n18)
-        n1.connect(n6,n13)
-        n2.connect(n1,n3)
-        n3.connect(n0,n13)
-        n4.connect(n0,n10)
-        n5.connect(n4)
-        n7.connect(n6)
-        n8.connect(n14,n15,n16)
-        n9.connect(n8,n17)
-        n10.connect(n6,n7,n9)
-        n11.connect(n3)
-        n12.connect(n11,n19,n20)
-        n13.connect(n19)
-        n15.connect(n17)
-        n18.connect(n3)
+        n0.connect(n1,n3,n4,n18)
+        n1.connect(n2,n6,n13)
+        n2.connect(n3,n11)
+        n3.connect(n18)
+        n4.connect(n10)
+        n5.connect(n6, n10)
+        n6.connect(n10,n14)
+        n7.connect(n8,n10,n14,n15)
+        n8.connect(n9,n10, n16)
+        n9.connect(n16)
+        n10.connect(n17)
+        n11.connect(n12,n1)
+        n12.connect(n19,n20)
+        n13.connect(n14,n20)
+        n16.connect(n17)
 
         # Show all nodes
         shows = []
@@ -188,7 +235,9 @@ class TransitionExplanation(Scene):
         for index, i in enumerate(graph):
             if index not in [0,1,3,4,18]:
                 animations.extend(i.remove(self))
-        self.play(*animations, n18.disconnect(n3,self), run_time=3)
+        self.play(*animations, n3.disconnect(n18,self), run_time=3)
+        for i in [n0,n1,n3,n4,n18]:
+            self.play(i.change_color(WHITE),run_time=0.2)
         self.play(n0.node.animate.move_to(ORIGIN), n1.node.animate.move_to([-2,2,0]), n3.node.animate.move_to([2,2,0]), n4.node.animate.move_to([-2,-2,0]), n18.node.animate.move_to([2,-2,0]))
 
 
@@ -269,11 +318,112 @@ class CentralizedExplanation(Scene):
 
 class DecentralizedExplanation(Scene):
     def construct(self):
-        pass
+        nodes = [([0,0],WHITE),
+                 ([2,2],YELLOW),
+                 ([3,0],LIGHTER_GRAY),
+                 ([2,-2],PURE_RED),
+                 ([0,-3],PURE_GREEN),
+                 ([-2,-2],PURE_BLUE),
+                 ([-3,0],RED),
+                 ([-2,2],LIGHT_BROWN)]
+        graph = []
+        for n in nodes:
+            graph.append(node.Node(n[0],n[1]))
+        graph[0].connect(*graph[1:])
+        shows=[]
+        for i in graph:
+            shows.extend(i.show())
+        self.play(*shows)
+        graph[0].upgrade(self)
+        
+            
+        node_pos = [[1,1],
+                    [2,3],
+                    [4,1],
+                    [3,-2],
+                    [0,-3],
+                    [-1,-1],
+                    [-3,0],
+                    [-2,2],
+                    [-5,3],
+                    [-6,0],
+                    [-4,-2],
+                    [5,-3],
+                    [6,-1],
+                    [6,3]]
+        animations = []
+        for index, n in enumerate(graph):
+            animations.append(n.node.animate.move_to(node_pos[index]+[0]))
+        self.play(*animations)
+        animations = []
+        
+        animations.extend([graph[0].disconnect(graph[3],self),
+                           graph[0].disconnect(graph[4],self),
+                           graph[0].disconnect(graph[5],self)])
+        colors = [RED, PURE_RED, PURE_BLUE, PURE_GREEN, YELLOW, DARK_BROWN]
+        for index, pos in enumerate(node_pos[len(graph):]):
+            graph.append(node.Node(pos, colors[index]))
+
+        graph[3].connect(graph[4])
+        graph[4].connect(graph[2], graph[11])
+        graph[5].connect(graph[6])
+        graph[8].connect(graph[1], graph[7])
+        graph[9].connect(graph[8], graph[7], graph[10])
+        graph[10].connect(graph[6], graph[5])
+        graph[12].connect(graph[11],graph[3],graph[2],graph[13])
+        graph[13].connect(graph[0], graph[1])
+
+        # Show all nodes
+        
+        for index, i in enumerate(graph):
+            if index not in (0,1,2,6,7):
+                animations.extend(i.show())
+        self.play(*animations)
+
+        graph[6].upgrade(self)
+        graph[8].upgrade(self)
+        graph[12].upgrade(self)
+        graph[12].start_edges[graph[13]].clear_updaters()
+        graph[12].start_edges[graph[13]].put_start_and_end_on([6,-0.5,0],graph[12].start_edges[graph[13]].get_end())
+        self.wait(0.5)
+
+        graph[3].send_through([graph[12],graph[2],graph[0],graph[7]], self)
+        graph[6].send_through([graph[10],graph[9],graph[8],graph[7],graph[0],graph[13]], self)
+        graph[4].send_through([graph[11],graph[12]], self)
+
+class Examples(Scene):
+    def construct(self):
+        centralized = Rectangle(height=8, width=14).scale(0.35).move_to([3.5,0.5,0])
+        decentralized = Rectangle(height=8, width=14).scale(0.35).move_to([-3.5,0.5,0])
+        terpusat = Tex('''Terpusat''').move_to([3.5,2.5,0])
+        c_example = Tex(''' - Google\\\\ - Meta''').move_to([3.5,-2,0])
+        terdesentralisasi = Tex('''Terdesentralisasi''').move_to([-3.5,2.5,0])
+        d_example = Tex(''' - BitTorrent\\\\ - Blockchain''').move_to([-3.5,-2,0])
+        self.play(*[FadeIn(m) for m in (centralized, decentralized, terpusat, terdesentralisasi)])
+        self.play(*[Write(m) for m in (c_example, d_example)])
 
 class MoreSurveyData(Scene):
     def construct(self):
-        pass
+        Centralized = Tex('Terpusat').move_to([3.5,2.5,0])
+        Decentralized = Tex('Terdesentralisasi').move_to([-3.5,2.5,0])
+        vs = Tex('melawan', font_size=35)
+        self.play(FadeIn(vs), Centralized.animate.shift([0,-2.5,0]), Decentralized.animate.shift([0,-2.5,0]))
+        Monitored = Tex('Diawasi').move_to(Centralized.get_center())
+        Free = Tex('Bebas').move_to(Decentralized.get_center())
+        self.wait(1)
+        self.play(Transform(Centralized,Monitored), Transform(Decentralized,Free))
+        self.wait(1)
+        self.remove(vs)
+        chart = BarChart(
+            values=[7, 18, 32, 20, 6],
+            bar_names=["1", "2", "3", "4", "5"],
+            bar_colors=[BLUE_A, BLUE_C, BLUE_E, BLUE_C,BLUE_A],
+            y_range=[0, 40, 10],
+            y_length=6,
+            x_length=10,
+            x_axis_config={"font_size": 36},
+        ).shift([0,0.75,0])
+        self.play(Create(chart), Centralized.animate.shift([0.5,-3.25,0]), Decentralized.animate.shift([-0.5,-3.25,0]))
 
 class CurrentInternet(Scene):
     def construct(self):
