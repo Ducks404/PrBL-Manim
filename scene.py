@@ -240,8 +240,6 @@ class TransitionExplanation(Scene):
             self.play(i.change_color(WHITE),run_time=0.2)
         self.play(n0.node.animate.move_to(ORIGIN), n1.node.animate.move_to([-2,2,0]), n3.node.animate.move_to([2,2,0]), n4.node.animate.move_to([-2,-2,0]), n18.node.animate.move_to([2,-2,0]))
 
-
-
 class CentralizedExplanation(Scene):
     def construct(self):
         title = Tex('''Terpusat''').move_to([0,3,0])
@@ -399,9 +397,9 @@ class Examples(Scene):
         centralized = Rectangle(height=8, width=14).scale(0.35).move_to([3.5,0.5,0])
         decentralized = Rectangle(height=8, width=14).scale(0.35).move_to([-3.5,0.5,0])
         terpusat = Tex('''Terpusat''').move_to([3.5,2.5,0])
-        c_example = Tex(''' - Google\\\\ - Meta''').move_to([3.5,-2,0])
+        c_example = Tex(''' - Google: mesin pencari web\\\\ - Meta: media sosial''', font_size=45).move_to([3.5,-2,0])
         terdesentralisasi = Tex('''Terdesentralisasi''').move_to([-3.5,2.5,0])
-        d_example = Tex(''' - BitTorrent\\\\ - Blockchain''').move_to([-3.5,-2,0])
+        d_example = Tex(''' - BitTorrent: berbagi file\\\\ - Blockchain: buku besar digital''', font_size=45).move_to([-3.5,-2,0])
         self.play(*[FadeIn(m) for m in (centralized, decentralized, terpusat, terdesentralisasi)])
         self.play(*[Write(m) for m in (c_example, d_example)])
 
@@ -447,8 +445,12 @@ class CurrentInternet(MovingCameraScene):
         graph = []
         colors = [RED, PURE_RED, PURE_BLUE, PURE_GREEN, YELLOW, DARK_BROWN]
         for i in node_pos:
-            graph.append(node.Node(i, ran.choice(colors)))
+            if i == [1,1]:
+                graph.append(node.Node(i, PURE_BLUE))
+            else:
+                graph.append(node.Node(i, ran.choice(colors)))
 
+        graph[0].connect(graph[1], graph[2])
         graph[3].connect(graph[4])
         graph[4].connect(graph[2], graph[11])
         graph[5].connect(graph[6])
@@ -513,23 +515,188 @@ class CurrentInternet(MovingCameraScene):
                   Transform(sq3, temp),
                   Transform(sq4, temp), lag_ratio=0.5))
         graph[0].send(graph[13],self)
+        graph[0].send(graph[1],self)
+        graph[0].send(graph[2],self)
+        graph[1].send(graph[13],self,color=PURE_BLUE)
         graph[0].send(graph[13],self)
-        graph[0].send(graph[13],self)
-        graph[0].send(graph[13],self)
+        graph[2].send(graph[12],self,color=PURE_BLUE)
+        graph[12].send(graph[13],self,color=PURE_BLUE)
 
         self.play(self.camera.frame.animate.set(width=30))
 
-class FutureInternet(Scene):
-    def construcotr(self):
-        pass
+        graph[10].disconnect(graph[14], graph[15], graph[16],self)
+        graph[9].disconnect(graph[16], graph[17],self)
+        graph[8].disconnect(graph[17], graph[18], graph[20],self)
+        graph[1].disconnect(graph[22],graph[24],graph[26],self)
+        graph[13].disconnect(graph[26],graph[28],self)
+        graph[11].disconnect(graph[29], graph[30],self)
+        
+
+class FutureInternet(MovingCameraScene):
+    def construct(self):
+        # for x in range(-10, 10):
+        #     for y in range(-4, 6):
+        #         self.add(Dot(np.array([x, y, 0]), color=DARK_GREY))
+        dweb = Text('''DWeb''').move_to([0,3,0])
+        p2p = Text('''Contoh Peer-to-peer sederhana dalam BitTorrent''', font_size=30, slant=ITALIC).move_to([0,2,0])
+        self.play(Write(dweb), Write(p2p))
+
+        node_pos = [[2,0],
+                    [2,3],
+                    [4,0],
+                    [3,-2],
+                    [0,-3],
+                    [0,-1],
+                    [-2,0],
+                    [-2,2],
+                    [-5,3],
+                    [-6,0],
+                    [-4,-2],
+                    [5,-3],
+                    [6,-1],
+                    [6,3]]
+        graph = []
+        colors = [RED, PURE_RED, PURE_GREEN, YELLOW, DARK_BROWN]
+        for index, i in enumerate(node_pos):
+            if index == 6 or index == 2 or index == 10 or index == 7:
+                graph.append(node.Node(i, PURE_BLUE))
+            elif index == 0:
+                graph.append(node.Node(i, PURE_RED))
+            elif index == 5:
+                graph.append(node.Node(i, YELLOW))
+            else:
+                graph.append(node.Node(i, ran.choice(colors)))
+
+        graph[0].connect(graph[6])
+        graph[3].connect(graph[4])
+        graph[4].connect(graph[2], graph[11])
+        graph[5].connect(graph[6], graph[0])
+        graph[8].connect(graph[1], graph[7])
+        graph[9].connect(graph[8], graph[7], graph[10])
+        graph[10].connect(graph[6], graph[5])
+        graph[12].connect(graph[11],graph[3],graph[2],graph[13])
+        graph[13].connect(graph[0], graph[1])
+
+        butuh = MarkupText(f'Butuh:', font_size=25)
+        punya = MarkupText(f'Punya:', font_size=25)
+        e1 = VGroup(butuh, punya).arrange(DOWN).move_to(graph[6].node.get_center()+np.array([-1,1,0]))
+        e2 = e1.copy().move_to(graph[0].node.get_center()+np.array([-1,1,0]))
+        e3 = e1.copy().move_to(graph[5].node.get_center()+np.array([-1,-1,0]))
+
+        self.play(*graph[0].show(), *graph[6].show(), Write(e1), Write(e2))
+        self.wait(1)
+        graph[6].send(graph[0], self)
+        graph[0].send(graph[6], self)
+        # self.play(ReplacementTransform(colorb1, colorb1_updated))
+        self.play(*graph[5].show(), Write(e3))
+        self.wait(1)
+        graph[6].send(graph[5], self)
+        graph[5].send(graph[6], self)
+
+        shows = []
+        for index, i in enumerate(graph):
+            if index not in (0,5,6):
+                shows.extend(i.show())
+
+        self.play(*shows, *[FadeOut(m) for m in (p2p,e1,e2,e3)], dweb.animate.shift([0,2,0]), self.camera.frame.animate.set(height=10).shift([0,1,0]))
+
+        graph[2].upgrade(self, run_time=0.1)
+        graph[10].upgrade(self, run_time=0.1)
+        graph[7].upgrade(self, run_time=0.1)
+        graph[11].upgrade(self, run_time=0.1)
+        graph[7].divide(self)
+
+        target_now = Text('Menggunakan lokasi',font_size=30).move_to(dweb.get_center()+np.array([0,-1,0]))
+        web = Text('Web Sekarang').move_to(dweb.get_center())
+        dweb_copy = dweb.copy()
+        target_future = Text('Menggunakan konten',font_size=30).move_to(target_now.get_center())
+        key = Text('Nomor -> Lokasi\nWarna -> Konten',font_size=35).to_corner().shift([-1,0,0])
+        add_numbers = []
+        for index, i in enumerate(graph):
+            add_numbers.append(FadeIn(Text(str(index),font_size=50).add_updater(lambda n, i=i: n.move_to(i.node.get_center()))))
+
+        self.play(FadeIn(key), FadeIn(target_now), ReplacementTransform(dweb,web), *add_numbers)
+        
+        text_now = Text('[0] butuh data yang ada di [7]', font_size=30).move_to([1.5,2,0])
+        self.play(FadeIn(text_now))
+        graph[0].send_through([graph[5],graph[10],graph[9],graph[7]], self)
+        graph[7].send_through([graph[9],graph[10],graph[5],graph[0]], self)
+
+        self.play(ReplacementTransform(target_now,target_future), ReplacementTransform(web,dweb_copy))
+        text_future = MarkupText(f'[0] butuh data yang <span fgcolor="{PURE_BLUE}">biru</span>', font_size=30).move_to(text_now.get_center())
+        self.play(ReplacementTransform(text_now, text_future))
+        graph[0].send_through([graph[5],graph[10]], self)
+        graph[10].send_through([graph[5],graph[0]], self)
+        self.wait(0.3)
+        graph[0].send_through([graph[13],graph[12],graph[2]], self)
+        graph[2].send_through([graph[12],graph[13],graph[0]], self)
+
+        self.wait(0.5)
+
+        dweb.shift([2,0,0])
+        blockchain = Text('Contoh Blockchain sederhana di cryptocurrency',slant=ITALIC,font_size=30).move_to(dweb.get_center()+np.array([0,-1,0]))
+        moves = []
+        for index, i in enumerate(graph):
+            if index == 0:
+                moves.append(i.node.animate.shift([1.5,1,0]))
+            elif index in (2,6,11,12,13,3,4):
+                moves.append(i.node.animate.shift([1.5,0,0]))
+            elif index in (8,9,10):
+                moves.append(i.node.animate.shift([3.5,0,0]))
+            else:
+                moves.append(i.node.animate.shift([2.5,0,0]))
+        self.play(ReplacementTransform(dweb_copy,dweb),ReplacementTransform(target_future,blockchain), FadeOut(text_future), FadeOut(key), *moves)
+
+        payments = ['A bayar B: 10','C bayar A: 20','D bayar C: 5']
+        signatures = ['<Tanda Tangan A>','<Tanda Tangan C>','<Tanda Tangan D>']
+        hashes = ['8d79bf9e20', '7124cd91504', 'edf1470f3dc', '53a3e4467b']
+        blocks = VGroup()
+
+        for i in range(3):
+            size=43
+            prev_hash = Tex(hashes[i],font_size=size)
+            payment = VGroup(Tex(payments[i],font_size=size),Tex(signatures[i],font_size=size)).arrange(DOWN)
+            this_hash = Tex(hashes[i+1],font_size=size)
+            block = Group(prev_hash,payment,this_hash).arrange(DOWN)
+            line_t = Line(start=ORIGIN, end=[block.width+0.4,0,0])
+            line_b = line_t.copy()
+            block = VGroup(prev_hash,line_t,payment,line_b,this_hash).arrange(DOWN,buff=0.1)
+            block.add(Rectangle(width=block.width+0.2, height=block.height+0.2).move_to(block.get_center()))
+            blocks.add(block)
+        
+        blocks.arrange(DOWN,buff=1).shift([-6,1,0])
+        arrow1 = Arrow(blocks.get_center()+np.array([0,2.32,0]),blocks.get_center()+np.array([0,0.98,0]))
+        arrow2 = Arrow(blocks.get_center()+np.array([0,-0.98,0]),blocks.get_center()+np.array([0,-2.32,0]))
+        chain = VGroup(blocks,arrow1,arrow2)
+        self.play(Create(chain))
+        self.wait(1)
+
+        trans = []
+        for i in graph:
+            temp_chain = chain.copy()
+            temp = Dot(radius=0.01).move_to(i.node.get_center())
+            trans.append(ReplacementTransform(temp_chain, temp, run_time=2))
+        self.play(*trans)
+        self.wait(1)
 
 class Credits(Scene):
     def construct(self):
-        pass
+        a = Tex('Animasi dibuat')
+        d = Tex('dengan')
+        g = VGroup(a,d).arrange(DOWN).shift([0,1,0])
+        self.play(Create(g))
+        Mr = Tex('Terima Kasih')
+        Eka = Tex('Pak Eka')
+        g1 = VGroup(Mr,Eka).arrange(DOWN)
+        self.play(FadeOut(d),Transform(a,Mr),Transform(d,Eka))
 
-'''
-Tests might break since I changed stuff throughout doing the actual pugs
-'''
+class Credits1(Scene):
+    def construct(self):
+        banner = ManimBanner()
+        self.play(banner.create())
+        self.play(banner.expand())
+
+# Tests might break since I changed stuff throughout doing the actual pugs
 
 class Test(Scene):
     def construct(self):
@@ -578,11 +745,13 @@ class TestNode(Scene):
         self.play(ApplyMethod(n.node.shift, [7, -5, 0]))
         n1.divide(self)
         self.play(ApplyMethod(n1.node.shift,[-3,0,0]))
-        n.send(n1, self)
-        n1.send(n, self)
-        n2.send_through([n, n1, n2, n1], self)
+        # n.send(n1, self)
+        # n1.send(n, self)
+        # n2.send_through([n, n1, n2, n1], self)
         n1.disconnect(n2, self)
         # n2.send(n1, self)
+        for i in (n,n1,n2):
+            self.play(FadeIn(Text('1',font_size=55).move_to(i.node.get_center())))
 
 class TestData(Scene):
     def construct(self):

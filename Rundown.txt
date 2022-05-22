@@ -38,13 +38,13 @@
 - Data, divide data, data move through nodes using different paths
 - Logos of big companies behind data centers
 
-// Future of the Internet
-- List of differences on the left
+// Future of the Internet ✔
+- Peer to peer 
 - Data based on color found with location on left
 - Data based on color found with color
 - Ledger on the left then share copies throughout the nodes
 
-// Credits
+// Credits ✔
 - My face recording on the left
 - Credits roll on the right: Mr Eka, 83 respondents, manim, any other resources I used
 
